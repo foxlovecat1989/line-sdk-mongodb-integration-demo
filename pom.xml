@@ -19,6 +19,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.maven.plugin.version>${project.parent.version}</spring.boot.maven.plugin.version>
         <lombok.version>1.18.24</lombok.version>
+        <line.bot.version>6.0.0</line.bot.version>
     </properties>
     <dependencies>
         <dependency>
@@ -36,6 +37,27 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+        </dependency>
+        <!--- line bot -->
+        <dependency>
+            <groupId>com.linecorp.bot</groupId>
+            <artifactId>line-bot-spring-boot</artifactId>
+            <version>${line.bot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.linecorp.bot</groupId>
+            <artifactId>line-bot-model</artifactId>
+            <version>${line.bot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.linecorp.bot</groupId>
+            <artifactId>line-bot-api-client</artifactId>
+            <version>${line.bot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.linecorp.bot</groupId>
+            <artifactId>line-bot-servlet</artifactId>
+            <version>${line.bot.version}</version>
         </dependency>
     </dependencies>
 
