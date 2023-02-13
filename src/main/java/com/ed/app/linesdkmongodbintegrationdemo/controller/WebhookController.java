@@ -2,6 +2,8 @@ package com.ed.app.linesdkmongodbintegrationdemo.controller;
 
 import com.ed.app.linesdkmongodbintegrationdemo.common.exception.UnknownOriginRequest;
 import com.ed.app.linesdkmongodbintegrationdemo.common.exception.VerifyOriginFailedException;
+import com.ed.app.linesdkmongodbintegrationdemo.model.dto.webhook.ReplyMessageRequestDto;
+import com.ed.app.linesdkmongodbintegrationdemo.model.dto.webhook.ReplyMessageResponseDto;
 import com.ed.app.linesdkmongodbintegrationdemo.service.WebhookService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -22,6 +24,8 @@ import static com.ed.app.linesdkmongodbintegrationdemo.common.constant.AppConsta
 @Slf4j
 @RequestMapping(value = "/webhook")
 public record WebhookController(WebhookService webhookService) {
+    public static final String REPLY_MESSAGE_URI = "api/v1/reply-message";
+    public static final String RECEIVE_MESSAGE_URI = "api/v1/receive";
 
     /**
      * <pre>
@@ -35,7 +39,7 @@ public record WebhookController(WebhookService webhookService) {
      *
      * </pre>
      */
-    @PostMapping(value = "api/v1/receive")
+    @PostMapping(value = RECEIVE_MESSAGE_URI)
     public ResponseEntity<?> receiveMessage(
             @RequestHeader("X-Line-Signature") String xLineSignature,
             @RequestBody String requestBody) throws InvalidKeyException, UnknownOriginRequest {
@@ -46,6 +50,25 @@ public record WebhookController(WebhookService webhookService) {
 
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * <pre>
+     * 依據 request裡的 replyToken與 replyMessage回復訊息
+     *
+     * @param request - reply message's request
+     * @return - ResponseEntity
+     */
+    @PostMapping(value = REPLY_MESSAGE_URI)
+    public ResponseEntity<ReplyMessageResponseDto> replyMessage(@RequestBody ReplyMessageRequestDto request) {
+        log.info("receive request: {}", request);
+        var botApiResponse = webhookService.processReplyMessage(request);
+        var response = ReplyMessageResponseDto.builder()
+                .botApiResponse(botApiResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
 
     /**
      * <pre>

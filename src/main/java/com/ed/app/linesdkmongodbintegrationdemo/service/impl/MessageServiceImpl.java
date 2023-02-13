@@ -1,5 +1,6 @@
 package com.ed.app.linesdkmongodbintegrationdemo.service.impl;
 
+import com.ed.app.linesdkmongodbintegrationdemo.common.exception.DataNotFoundException;
 import com.ed.app.linesdkmongodbintegrationdemo.common.util.BeanTransformUtil;
 import com.ed.app.linesdkmongodbintegrationdemo.entity.po.MessagePo;
 import com.ed.app.linesdkmongodbintegrationdemo.model.pojo.MessagePojo;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -70,11 +72,46 @@ public record MessageServiceImpl(MessageRepository messageRepository) implements
                 .toList();
         var returnPos = messageRepository.saveAll(messagePos);
         log.info("Save the following Messages to DB: ");
-        returnPos.forEach(returnPo -> log.info("From UserId: <{}>, Message: [{}], At: {}",
-                returnPo.getUserId(), returnPo.getMessage(), returnPo.getCreateAt()));
+        returnPos.forEach(returnPo -> log.info("From UserId: <{}>, Message: [{}], At: {}, ReplyToken: {}",
+                returnPo.getUserId(), returnPo.getMessage(), returnPo.getCreateAt(), returnPo.getReplyToken()));
 
         return returnPos.stream()
                 .map(messagePo -> (MessagePojo) BeanTransformUtil.transformPo2Pojo(messagePo, MessagePojo.class))
                 .toList();
+    }
+
+    /**
+     * <pre>
+     * 透過 replyToken查找到符合的唯一 MessagePo結果，並轉換成 MessagePojo轉換成回應
+     * 若無結果回覆 Optional.empty()
+     *
+     * @param replyToken - 回覆的 replyToken
+     * @return - 透過 replyToken查找到的結果
+     *
+     * </pre>
+     */
+    @Override
+    public Optional<MessagePojo> findByReplyToken(String replyToken) {
+        var messagePoOpt =  messageRepository.findByReplyToken(replyToken);
+        log.debug("By replyToken: {} - find messagePoOpt: {}", replyToken, messagePoOpt);
+
+        return messagePoOpt.map(messagePo -> BeanTransformUtil.transformPo2Pojo(messagePo, MessagePojo.class));
+    }
+
+    /**
+     * <pre>
+     * 將此 id的 MessagePo's isHasBeenReplied設為 true
+     *
+     * @param id - MessagePo's id
+     *
+     * </pre>
+     */
+    @Override
+    public void setIsHasBeenRepliedTrue(String id) {
+        var messagePo = messageRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("id: " + id));
+        messagePo.setIsHasBeenReplied(Boolean.TRUE);
+        messageRepository.save(messagePo);
+        log.info("set ID: <{}>'s MessagePo 已被回覆", id);
     }
 }

@@ -14,7 +14,8 @@ spring:
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
 line.bot:
-  channel-token: G/DWAJgA9y7TCbXKhFYc3BTNUUhFbf+1J43ICekBMaADugB+w7Xd1wMBQAoPl/on4yFB5NkDZ29/7qfRARM7midd6908L7aPek01nkWEP58suvuqgn36buvh1pt1NyhkCmDJkD5hGTmCedsw4MNCxgdB04t89/1O/w1cDnyilFU=
-  channel-secret: 2f40e0920de329e7e52da38353df2405
+  channel-token: bJzHx/RE0+uKChZk5A1lBXlNtoJOGl/H2K9dS98tV9di9H9kNy07ep+OqDFLCZFMvkRW2Y/wPcDnVgLXOlvoVuXKLmk017FiO4Ir5iZdke1jBwqgak/wV5Y+GYsW0Fls9dqKMGRkWIK1NIAmiami6gdB04t89/1O/w1cDnyilFU=
+  channel-secret: 8f1c0847a57a03547bef7066c421d1d9
   algorithm: HmacSHA256
+  reply-message-prefix: "🦜: "
 

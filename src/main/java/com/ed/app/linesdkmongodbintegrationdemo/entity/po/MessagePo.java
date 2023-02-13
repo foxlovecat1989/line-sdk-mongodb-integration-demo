@@ -26,7 +26,13 @@ public class MessagePo implements BasePo {
     // 訊息內容
     @Field(value = "message")
     private String message;
+    // Reply token used to send reply message to this event
+    @Field(value = "replyToken")
+    private String replyToken;
     // 建立時間
     @Field(value = "createAt")
     private Date createAt;
+    // 是否已回復過訊息
+    @Field(value = "isHasBeenReplied")
+    private Boolean isHasBeenReplied;
 }
