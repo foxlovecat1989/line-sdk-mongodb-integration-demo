@@ -20,6 +20,7 @@
         <spring.boot.maven.plugin.version>${project.parent.version}</spring.boot.maven.plugin.version>
         <lombok.version>1.18.24</lombok.version>
         <line.bot.version>6.0.0</line.bot.version>
+        <common.lang3.version>3.12.0</common.lang3.version>
     </properties>
     <dependencies>
         <dependency>
@@ -64,6 +65,11 @@
             <groupId>com.linecorp.bot</groupId>
             <artifactId>line-bot-servlet</artifactId>
             <version>${line.bot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${common.lang3.version}</version>
         </dependency>
     </dependencies>
 

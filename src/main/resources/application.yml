@@ -16,4 +16,5 @@ spring:
 line.bot:
   channel-token: G/DWAJgA9y7TCbXKhFYc3BTNUUhFbf+1J43ICekBMaADugB+w7Xd1wMBQAoPl/on4yFB5NkDZ29/7qfRARM7midd6908L7aPek01nkWEP58suvuqgn36buvh1pt1NyhkCmDJkD5hGTmCedsw4MNCxgdB04t89/1O/w1cDnyilFU=
   channel-secret: 2f40e0920de329e7e52da38353df2405
-  handler.path: /callback
+  algorithm: HmacSHA256
+

@@ -7,4 +7,5 @@ import java.util.List;
 public interface MessageService {
     MessagePojo saveMessage(MessagePojo messagePojo);
     List<MessagePojo> findAllByUserId(String userId);
+    List<MessagePojo> saveAllMessages(List<MessagePojo> messagePojos);
 }

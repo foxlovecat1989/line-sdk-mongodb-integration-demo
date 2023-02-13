@@ -111,9 +111,8 @@ public class BeanTransformUtil {
         if (isCorrespondingClassType)
             return;
 
-        var errorMsg = "Pojo與Po非相對應的型別";
-        log.error(errorMsg);
+        log.error(BeanTransformIllegalArgumentException.ERROR_MSG);
 
-        throw new BeanTransformIllegalArgumentException(errorMsg);
+        throw new BeanTransformIllegalArgumentException();
     }
 }
