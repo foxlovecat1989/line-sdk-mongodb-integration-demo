@@ -1,8 +1,10 @@
 package com.ed.app.linesdkmongodbintegrationdemo.controller;
 
+import com.ed.app.linesdkmongodbintegrationdemo.common.exception.handler.message.MessageExceptionHandling;
 import com.ed.app.linesdkmongodbintegrationdemo.model.dto.message.QueryMessageRequestDto;
 import com.ed.app.linesdkmongodbintegrationdemo.model.dto.message.QueryMessageResponseDto;
 import com.ed.app.linesdkmongodbintegrationdemo.service.MessageService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/message")
 @Slf4j
-public record MessageController(MessageService messageService) {
+@RequiredArgsConstructor
+public class MessageController extends MessageExceptionHandling {
+
+    private final MessageService messageService;
+
     public static final String QUERY_MESSAGES_URI = "api/v1/query-messages";
 
     /**

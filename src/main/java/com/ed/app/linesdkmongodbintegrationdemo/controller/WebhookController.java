@@ -1,10 +1,11 @@
 package com.ed.app.linesdkmongodbintegrationdemo.controller;
 
-import com.ed.app.linesdkmongodbintegrationdemo.common.exception.UnknownOriginRequest;
-import com.ed.app.linesdkmongodbintegrationdemo.common.exception.VerifyOriginFailedException;
+import com.ed.app.linesdkmongodbintegrationdemo.common.exception.UnknownOriginRequestException;
+import com.ed.app.linesdkmongodbintegrationdemo.common.exception.handler.webhook.WebhookExceptionHandling;
 import com.ed.app.linesdkmongodbintegrationdemo.model.dto.webhook.ReplyMessageRequestDto;
 import com.ed.app.linesdkmongodbintegrationdemo.model.dto.webhook.ReplyMessageResponseDto;
 import com.ed.app.linesdkmongodbintegrationdemo.service.WebhookService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,11 @@ import static com.ed.app.linesdkmongodbintegrationdemo.common.constant.AppConsta
 @RestController
 @Slf4j
 @RequestMapping(value = "/webhook")
-public record WebhookController(WebhookService webhookService) {
+@RequiredArgsConstructor
+public class WebhookController extends WebhookExceptionHandling {
+
+    private final WebhookService webhookService;
+
     public static final String REPLY_MESSAGE_URI = "api/v1/reply-message";
     public static final String RECEIVE_MESSAGE_URI = "api/v1/receive";
 
@@ -35,14 +40,16 @@ public record WebhookController(WebhookService webhookService) {
      * @param requestBody - 來至 Webhook's requestBody
      * @return - ResponseEntity
      * @throws InvalidKeyException - 若是 signature不正確將會拋出此錯
-     * @throws UnknownOriginRequest - 若是來源不是 Line將會拋出此錯
+     * @throws UnknownOriginRequestException - 若是來源不是 Line將會拋出此錯
+     * @throws NoSuchAlgorithmException - 若是 Algorithm錯誤將會拋出此錯
      *
      * </pre>
      */
     @PostMapping(value = RECEIVE_MESSAGE_URI)
     public ResponseEntity<?> receiveMessage(
             @RequestHeader("X-Line-Signature") String xLineSignature,
-            @RequestBody String requestBody) throws InvalidKeyException, UnknownOriginRequest {
+            @RequestBody String requestBody)
+            throws InvalidKeyException, UnknownOriginRequestException, NoSuchAlgorithmException {
         log.info("receive request from webhook event - xLineSignature: {}, requestBody: {}",
                 xLineSignature, requestBody);
         checkRequestFromLine(requestBody, xLineSignature);
@@ -79,12 +86,13 @@ public record WebhookController(WebhookService webhookService) {
      * @param requestBody - 來至 Webhook's requestBody
      * @param xLineSignature - The signature in the x-line-signature request header
      * @throws InvalidKeyException - 若是 signature不正確將會拋出此錯
-     * @throws UnknownOriginRequest - 若是來源不是 Line將會拋出此錯
+     * @throws UnknownOriginRequestException - 若是來源不是 Line將會拋出此錯
+     * @throws NoSuchAlgorithmException - 若是 Algorithm錯誤將會拋出此錯
      *
      * </pre>
      */
     public void checkRequestFromLine(String requestBody, String xLineSignature)
-            throws UnknownOriginRequest, InvalidKeyException {
+            throws UnknownOriginRequestException, InvalidKeyException, NoSuchAlgorithmException {
         SecretKeySpec key = new SecretKeySpec(LINE_CHANNEL_SECRET.getBytes(), LINE_ALGORITHM);
         Mac mac;
         try {
@@ -95,11 +103,11 @@ public record WebhookController(WebhookService webhookService) {
             var isXLineSignaturePresent = Optional.ofNullable(xLineSignature).isPresent();
             var isRequestFromLine = isXLineSignaturePresent && signature.equals(xLineSignature);
             if(!isRequestFromLine)
-                throw new UnknownOriginRequest();
+                throw new UnknownOriginRequestException();
         } catch (NoSuchAlgorithmException e) {
             log.error("e.getCause(): {}, e.getMessage(): {}", e.getCause(), e.getMessage());
 
-            throw new VerifyOriginFailedException(e.getMessage());
+            throw new NoSuchAlgorithmException(e.getMessage());
         }
     }
 }
