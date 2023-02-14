@@ -17,4 +17,8 @@ public class ReplyMessageResponseDto {
     // call line's reply message API response
     @JsonProperty(value = "botApiResponse")
     private BotApiResponse botApiResponse;
+    @JsonProperty(value = "replyToken")
+    private String replyToken;
+    @JsonProperty(value = "replyMessage")
+    private String replyMessage;
 }

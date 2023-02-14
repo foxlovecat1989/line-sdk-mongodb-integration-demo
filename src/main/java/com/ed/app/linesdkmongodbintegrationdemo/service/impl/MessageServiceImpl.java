@@ -3,6 +3,7 @@ package com.ed.app.linesdkmongodbintegrationdemo.service.impl;
 import com.ed.app.linesdkmongodbintegrationdemo.common.exception.DataNotFoundException;
 import com.ed.app.linesdkmongodbintegrationdemo.common.util.BeanTransformUtil;
 import com.ed.app.linesdkmongodbintegrationdemo.entity.po.MessagePo;
+import com.ed.app.linesdkmongodbintegrationdemo.model.dto.message.QueryMessageRequestDto;
 import com.ed.app.linesdkmongodbintegrationdemo.model.pojo.MessagePojo;
 import com.ed.app.linesdkmongodbintegrationdemo.repository.MessageRepository;
 import com.ed.app.linesdkmongodbintegrationdemo.service.MessageService;
@@ -15,25 +16,6 @@ import java.util.Optional;
 @Service
 @Slf4j
 public record MessageServiceImpl(MessageRepository messageRepository) implements MessageService {
-
-    /**
-     * <pre>
-     * 將 messagePojo儲存至 DB，並 return來至 DB儲存後的 MessagePojo
-     *
-     * @param messagePojo - 要儲存至DB的 MessagePojo
-     * @return - 來至 DB儲存後的 MessagePojo
-     *
-     * </pre>
-     */
-    @Override
-    public MessagePojo saveMessage(MessagePojo messagePojo) {
-        MessagePo messagePo = BeanTransformUtil.transformPojo2Po(messagePojo, MessagePo.class);
-        MessagePo returnPo = messageRepository.save(messagePo);
-        log.info("Save Message to DB - UserId: <{}>, Message: [{}], At: {}",
-                returnPo.getUserId(), returnPo.getMessage(), returnPo.getCreateAt());
-
-        return BeanTransformUtil.transformPo2Pojo(returnPo, MessagePojo.class);
-    }
 
     /**
      * <pre>
@@ -61,12 +43,9 @@ public record MessageServiceImpl(MessageRepository messageRepository) implements
      * 將 messagePojos儲存至 DB，並 return來至 DB儲存後的 MessagePojos
      *
      * @param messagePojos - 要儲存至DB的 MessagePojos
-     * @return - 來至 DB儲存後的 MessagePojos
-     *
-     * </pre>
      */
     @Override
-    public List<MessagePojo> saveAllMessages(List<MessagePojo> messagePojos) {
+    public void saveAllMessages(List<MessagePojo> messagePojos) {
         var messagePos = messagePojos.stream()
                 .map(messagePojo -> (MessagePo) BeanTransformUtil.transformPojo2Po(messagePojo, MessagePo.class))
                 .toList();
@@ -74,10 +53,6 @@ public record MessageServiceImpl(MessageRepository messageRepository) implements
         log.info("Save the following Messages to DB: ");
         returnPos.forEach(returnPo -> log.info("From UserId: <{}>, Message: [{}], At: {}, ReplyToken: {}",
                 returnPo.getUserId(), returnPo.getMessage(), returnPo.getCreateAt(), returnPo.getReplyToken()));
-
-        return returnPos.stream()
-                .map(messagePo -> (MessagePojo) BeanTransformUtil.transformPo2Pojo(messagePo, MessagePojo.class))
-                .toList();
     }
 
     /**
@@ -113,5 +88,26 @@ public record MessageServiceImpl(MessageRepository messageRepository) implements
         messagePo.setIsHasBeenReplied(Boolean.TRUE);
         messageRepository.save(messagePo);
         log.info("set ID: <{}>'s MessagePo 已被回覆", id);
+    }
+
+    /**
+     * <pre>
+     * 透過 userId查詢 複數 MessagePojo結果
+     *
+     * @param request - 來至 controller的請求
+     * @return - 複數 MessagePojo查詢結果
+     * </pre>
+     */
+    @Override
+    public List<MessagePojo> processQueryMessages(QueryMessageRequestDto request) {
+        var messagePojos = findAllByUserId(request.getUserId());
+        messagePojos.forEach(messagePojo ->
+                log.info("Find UserId: <{}>, Message: [{}], CreateAt: {}, ReplyToken: {}",
+                        messagePojo.getUserId(),
+                        messagePojo.getMessage(),
+                        messagePojo.getCreateAt(),
+                        messagePojo.getReplyToken()));
+
+        return messagePojos;
     }
 }

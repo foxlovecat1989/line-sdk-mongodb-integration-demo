@@ -64,6 +64,8 @@ public record WebhookController(WebhookService webhookService) {
         var botApiResponse = webhookService.processReplyMessage(request);
         var response = ReplyMessageResponseDto.builder()
                 .botApiResponse(botApiResponse)
+                .replyToken(request.getReplyToken())
+                .replyMessage(request.getReplyMessage())
                 .build();
 
         return ResponseEntity.ok(response);
